@@ -14,7 +14,6 @@ func main() {
 		panic(err)
 	}
 	defer f.Close()
-
 	scanner := bufio.NewScanner(f)
 	var pt1, pt2 int64
 	for scanner.Scan() {
@@ -32,6 +31,7 @@ func main() {
 	}
 	fmt.Println("part 1: ", pt1)
 	fmt.Println("part 2: ", pt2)
+
 }
 
 func negs(in ...int64) int64 {
@@ -61,12 +61,11 @@ func zeros(row []int64) bool {
 	return true
 }
 
-// Parses b into an int64 slice.
 func parseRow(b []byte) []int64 {
-	split := bytes.Split(b, []byte(" "))
-	out := make([]int64, len(split))
-	for i := range split {
-		n, err := strconv.ParseInt(string(split[i]), 10, 64)
+	fields := bytes.Fields(b)
+	out := make([]int64, len(fields))
+	for i := range fields {
+		n, err := strconv.ParseInt(string(fields[i]), 10, 64)
 		if err == nil {
 			out[i] = n
 		}
