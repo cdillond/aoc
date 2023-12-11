@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"os"
-	"sort"
 )
 
 type offset struct {
@@ -29,28 +28,14 @@ func main() {
 	rows := bytes.Fields(b)
 	start := findStart(rows)
 
-	// walk the pipes, in all four directions from the start point
-	n := WalkPipes(step(north, start), north, rows, []offset{}, make(map[offset]struct{}))
-	e := WalkPipes(step(east, start), east, rows, []offset{}, make(map[offset]struct{}))
-	s := WalkPipes(step(south, start), south, rows, []offset{}, make(map[offset]struct{}))
-	w := WalkPipes(step(west, start), west, rows, []offset{}, make(map[offset]struct{}))
+	maxPath, maxSet := WalkPipes(start, rows)
 
-	// choose the longest loop; the two longest will be redundant, as will the two shortest
-	res := [][]offset{n, e, s, w}
-	sort.Slice(res, func(i, j int) bool { return len(res[i]) > len(res[j]) })
-
-	fmt.Println("part 1: ", (len(res[0])+1)/2)
-
-	// re-calculate the set of all (i,j) positions in the loop
-	seen := make(map[offset]struct{}, len(res[0]))
-	for i := range res[0] {
-		seen[res[0][i]] = struct{}{}
-	}
+	fmt.Println("part 1: ", (len(maxPath)+1)/2)
 
 	// replace the 'S' with its actual, inferred type
-	rows[start.i][start.j] = findStartType(res[0])
+	rows[start.i][start.j] = findStartType(maxPath)
 
-	fmt.Println("part 2: ", countInterior(rows, seen))
+	fmt.Println("part 2: ", countInterior(rows, maxSet))
 
 }
 
@@ -102,23 +87,41 @@ func findStart(rows [][]byte) offset {
 	return offset{}
 }
 
-// Walks along the pipes and returns when a cycle is detected or the pipes lead out of bounds or to a '.' tile.
-func WalkPipes(start offset, d direction, pipes [][]byte, path []offset, seen map[offset]struct{}) []offset {
-	if start.i < 0 || start.j < 0 || start.i >= len(pipes) || start.j >= len(pipes[start.i]) {
-		return path
+// For each direction, WalkPipes walks along the pipes and stops when a cycle is detected or the pipes lead out of bounds or to a '.' tile.
+// Returns the path of the longest loop and the set of all offsets in the path.
+func WalkPipes(start offset, pipes [][]byte) ([]offset, map[offset]struct{}) {
+	var maxPath []offset
+	var maxSet map[offset]struct{}
+	var maxLen int
+	for i := north; i <= west; i++ {
+		index := step(i, start)
+		d := i
+		var path []offset
+		seen := make(map[offset]struct{})
+		for {
+			if index.i < 0 || index.j < 0 || index.i >= len(pipes) || index.j >= len(pipes[index.i]) {
+				return path, nil
+			}
+			if _, ok := seen[index]; ok {
+				break
+			}
+			seen[index] = struct{}{}
+			path = append(path, index)
+			p := pipes[index.i][index.j]
+			nextDir := next(p, d)
+			if nextDir == stop {
+				break
+			}
+			d = nextDir
+			index = step(nextDir, index)
+		}
+		if len(path) > maxLen {
+			maxLen = len(path)
+			maxPath = path
+			maxSet = seen
+		}
 	}
-	if _, ok := seen[start]; ok {
-		return path
-	}
-	seen[start] = struct{}{}
-	path = append(path, start)
-	p := pipes[start.i][start.j]
-	nextDir := next(p, d)
-	if nextDir == stop {
-		return path
-	}
-	nextOff := step(nextDir, start)
-	return WalkPipes(nextOff, nextDir, pipes, path, seen)
+	return maxPath, maxSet
 }
 
 // Infers the type of pipe 'S' is from the pipes directly before and after it in the loop.
