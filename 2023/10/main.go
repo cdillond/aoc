@@ -107,8 +107,8 @@ func WalkPipes(start offset, pipes [][]byte) ([]offset, map[offset]struct{}) {
 			}
 			seen[index] = struct{}{}
 			path = append(path, index)
-			p := pipes[index.i][index.j]
-			nextDir := next(p, d)
+			c := pipes[index.i][index.j]
+			nextDir := next(c, d)
 			if nextDir == stop {
 				break
 			}
@@ -159,7 +159,6 @@ func countInterior(rows [][]byte, loop map[offset]struct{}) int {
 		// L*7 and F*J patterns connect to form, in effect, a single vertical edge
 		var lastVertex byte
 		for j := 0; j < len(rows[i])-1; j++ {
-
 			if _, ok := loop[offset{i, j}]; ok {
 				switch rows[i][j] {
 				case '|':
@@ -175,7 +174,6 @@ func countInterior(rows [][]byte, loop map[offset]struct{}) int {
 				case '7':
 					if lastVertex == 'L' {
 						in = !in
-
 					}
 					lastVertex = 0
 				}
@@ -185,7 +183,6 @@ func countInterior(rows [][]byte, loop map[offset]struct{}) int {
 					count++
 				}
 			}
-
 		}
 	}
 	return count
