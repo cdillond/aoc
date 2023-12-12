@@ -32,9 +32,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
 	rows := bytes.Fields(b)
-
 	emptyR := make([]bool, len(rows))    // records whether the i'th row of rows is empty
 	emptyC := make([]bool, len(rows[0])) // records whether j'th col of rows is empty
 	counts := make([]int, len(rows[0]))
@@ -54,7 +52,6 @@ func main() {
 	for i := range counts {
 		emptyC[i] = counts[i] == len(rows)
 	}
-
 	fmt.Println("part 1: ", solve(rows, 2, emptyR, emptyC))
 	fmt.Println("part 2: ", solve(rows, 1_000_000, emptyR, emptyC))
 }
