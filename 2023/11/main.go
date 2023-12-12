@@ -14,7 +14,7 @@ type pair struct {
 	a, b galaxy
 }
 
-func (p pair) Distance() int {
+func (p pair) distance() int {
 	dY := p.b.i - p.a.i
 	dX := p.b.j - p.a.j
 
@@ -55,17 +55,17 @@ func main() {
 		emptyC[i] = counts[i] == len(rows)
 	}
 
-	fmt.Println("part 1: ", Solve(rows, 2, emptyR, emptyC))
-	fmt.Println("part 2: ", Solve(rows, 1_000_000, emptyR, emptyC))
+	fmt.Println("part 1: ", solve(rows, 2, emptyR, emptyC))
+	fmt.Println("part 2: ", solve(rows, 1_000_000, emptyR, emptyC))
 }
 
-func Solve(rows [][]byte, adj int, emptyR, emptyC []bool) int {
-	// the adjustment factor is always 1 more than the number of cols that need to be added
+func solve(rows [][]byte, adj int, emptyR, emptyC []bool) int {
+	// the adjustment factor is always 1 more than the number of rows or cols that need to be added
 	galaxies := findGalaxies(rows, adj-1, emptyR, emptyC)
 	pairs := toPairs(galaxies)
 	var sum int
 	for _, p := range pairs {
-		sum += p.Distance()
+		sum += p.distance()
 	}
 	return sum
 }
