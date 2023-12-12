@@ -36,7 +36,6 @@ func main() {
 	rows[start.i][start.j] = findStartType(maxPath)
 
 	fmt.Println("part 2: ", countInterior(rows, maxSet))
-
 }
 
 // Returns the direction of the next symbol given the current symbol and direction.
