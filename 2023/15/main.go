@@ -15,31 +15,22 @@ type entry struct {
 type hmap [256][]entry
 
 func (h *hmap) delete(label string, i uint8) {
-	n := -1
 	for j := range h[i] {
 		if h[i][j].label == label {
-			n = j
-			break
+			h[i] = append(h[i][:j], h[i][j+1:]...)
+			return
 		}
-	}
-	if n >= 0 {
-		h[i] = append(h[i][:n], h[i][n+1:]...)
 	}
 }
 
 func (h *hmap) add(e entry, i uint8) {
-	n := -1
 	for j := range h[i] {
 		if h[i][j].label == e.label {
-			n = j
-			break
+			h[i][j] = e
+			return
 		}
 	}
-	if n >= 0 {
-		h[i][n] = e
-	} else {
-		h[i] = append(h[i], e)
-	}
+	h[i] = append(h[i], e)
 }
 
 func (h *hmap) score() int {
@@ -98,7 +89,6 @@ func main() {
 		panic(err)
 	}
 	fields := bytes.Split(b, []byte(","))
-
 	fmt.Println("part 1: ", part1(fields))
 	fmt.Println("part 2: ", part2(fields))
 }
