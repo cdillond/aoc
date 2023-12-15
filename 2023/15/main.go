@@ -98,6 +98,7 @@ func main() {
 		panic(err)
 	}
 	fields := bytes.Split(b, []byte(","))
+
 	fmt.Println("part 1: ", part1(fields))
 	fmt.Println("part 2: ", part2(fields))
 }
