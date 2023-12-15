@@ -38,22 +38,30 @@ func main() {
 			}
 		}
 
+		var smudged bool
+		//var found bool
 		for i, row := range rows {
-			if i < len(rows)-1 && cmp(row, rows[i+1]) < 2 {
-				if ok := check2(rows, i); ok {
+			if i < len(rows)-1 {
+				switch cmp(row, rows[i+1]) {
+				case 0:
+				case 1:
+					if smudged {
+						continue
+					}
+					smudged = true
+				default:
+					continue
+				}
+				if ok, _ := check2(rows, i, smudged); ok {
+					//if !s {
+					//	continue
+					//}
 					count2 += 100 * (i + 1)
+
 					break
 				}
 			}
 		}
-
-		//	for i, col := range cols {
-		//		if i < len(cols)-1 && col == cols[i+1] {
-		//			if ok := check2(cols, i); ok {
-		//				count2 += (i + 1)
-		//			}
-		//		}
-		//	}
 
 	}
 	fmt.Println(count)
@@ -79,13 +87,22 @@ func cmp(s1, s2 string) int {
 	return dif
 }
 
-func check2(r []string, i int) bool {
+func check2(r []string, i int, smudged bool) (bool, bool) {
+	//if smudged {
+	//	return check(r, i)
+	//}
 	for j := i + 1; i >= 0 && j < len(r); i, j = i-1, j+1 {
-		if r[i] != r[j] && cmp(r[i], r[j]) != 1 {
-			return false
+		if r[i] != r[j] {
+			if !smudged {
+				if cmp(r[i], r[j]) == 1 {
+					smudged = true
+					continue
+				}
+			}
+			return false, smudged
 		}
 	}
-	return true
+	return true, smudged
 }
 
 func check(r []string, i int) bool {
