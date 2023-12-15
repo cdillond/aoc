@@ -42,14 +42,14 @@ func (h *hmap) add(e entry, i uint8) {
 	}
 }
 
-func (h *hmap) score() uint64 {
+func (h *hmap) score() int {
 	var sum int
 	for i := range h {
 		for j := range h[i] {
 			sum += (1 + i) * (1 + j) * h[i][j].n
 		}
 	}
-	return uint64(sum)
+	return sum
 }
 
 func hash(b []byte) uint8 {
@@ -61,7 +61,7 @@ func hash(b []byte) uint8 {
 		}
 		cur += uint64(t)
 		cur *= 17
-		cur %= 256
+		//cur %= 256 can be omitted since the return value is a uint8
 	}
 	return uint8(cur)
 }
@@ -74,7 +74,7 @@ func part1(fields [][]byte) uint64 {
 	return sum
 }
 
-func part2(fields [][]byte) uint64 {
+func part2(fields [][]byte) int {
 	var m hmap
 	for i := range fields {
 	loop:
