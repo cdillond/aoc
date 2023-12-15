@@ -8,16 +8,16 @@ import (
 )
 
 type entry struct {
-	s string
-	n int
+	label string
+	n     int
 }
 
 type hmap [256][]entry
 
-func (h *hmap) delete(s string, i uint8) {
+func (h *hmap) delete(label string, i uint8) {
 	n := -1
 	for j := range h[i] {
-		if h[i][j].s == s {
+		if h[i][j].label == label {
 			n = j
 			break
 		}
@@ -30,7 +30,7 @@ func (h *hmap) delete(s string, i uint8) {
 func (h *hmap) add(e entry, i uint8) {
 	n := -1
 	for j := range h[i] {
-		if h[i][j].s == e.s {
+		if h[i][j].label == e.label {
 			n = j
 			break
 		}
@@ -82,7 +82,7 @@ func part2(fields [][]byte) uint64 {
 			switch fields[i][j] {
 			case '=':
 				a, _ := strconv.Atoi(string(fields[i][j+1:]))
-				m.add(entry{s: string(fields[i][:j]), n: a}, hash(fields[i][:j]))
+				m.add(entry{label: string(fields[i][:j]), n: a}, hash(fields[i][:j]))
 				break loop
 			case '-':
 				m.delete(string(fields[i][:j]), hash(fields[i][:j]))
