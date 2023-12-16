@@ -44,17 +44,17 @@ func (h *hmap) score() int {
 }
 
 func hash(b []byte) uint8 {
-	var cur uint64
+	var cur uint8
 	for i := range b {
 		t := b[i]
 		if t == '\n' || t == '\r' {
 			continue
 		}
-		cur += uint64(t)
+		cur += t
 		cur *= 17
 		//cur %= 256 can be omitted since the return value is a uint8
 	}
-	return uint8(cur)
+	return cur
 }
 
 func part1(fields [][]byte) uint64 {
