@@ -36,49 +36,61 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	rows := parse(bytes.Fields(b))
-	fmt.Println("part 1: ", startAt(beam{dir: east}, clone(rows)))
-	fmt.Println("part 2: ", part2(rows))
+	grid := parse(bytes.Fields(b))
+	fmt.Println("part 1: ", startAt(beam{dir: east}, clone(grid)))
+	fmt.Println("part 2: ", part2(grid))
 }
 
 func startAt(b beam, r [][]tile) int {
-	path := []beam{b}
+	current := []beam{b}
 	var count int
-	for len(path) > 0 {
+	for len(current) > 0 {
 		var next []beam
-		for i := range path {
-			if r[path[i].i][path[i].j].state == 0 {
+		for i := range current {
+			if r[current[i].i][current[i].j].state == 0 {
 				count++
 			}
-			nextDirs := visit(path[i], r)
+			nextDirs := visit(current[i], r)
 			for j := range nextDirs {
-				nextBeam := step(path[i].index, nextDirs[j])
+				nextBeam := step(current[i].index, nextDirs[j])
 				if nextBeam.i >= 0 && nextBeam.j >= 0 && nextBeam.i < len(r) && nextBeam.j < len(r[0]) {
 					next = append(next, nextBeam)
 				}
 			}
 		}
-		path = next
+		current = next
 	}
 	return count
 }
 
-func part2(rows [][]tile) int {
+func part2(grid [][]tile) int {
 	out := make(chan int)
 	var wg sync.WaitGroup
 	wg.Add(1)
 	go func() {
-		for j := range rows[0] {
-			out <- startAt(beam{index{0, j}, south}, clone(rows))
-			out <- startAt(beam{index{len(rows) - 1, j}, north}, clone(rows))
+		for j := range grid[0] {
+			out <- startAt(beam{index{0, j}, south}, clone(grid))
 		}
 		wg.Done()
 	}()
 	wg.Add(1)
 	go func() {
-		for i := range rows {
-			out <- startAt(beam{index{i, 0}, east}, clone(rows))
-			out <- startAt(beam{index{i, len(rows[0]) - 1}, west}, clone(rows))
+		for j := range grid[0] {
+			out <- startAt(beam{index{len(grid) - 1, j}, north}, clone(grid))
+		}
+		wg.Done()
+	}()
+	wg.Add(1)
+	go func() {
+		for i := range grid {
+			out <- startAt(beam{index{i, 0}, east}, clone(grid))
+		}
+		wg.Done()
+	}()
+	wg.Add(1)
+	go func() {
+		for i := range grid {
+			out <- startAt(beam{index{i, len(grid[0]) - 1}, west}, clone(grid))
 		}
 		wg.Done()
 		wg.Wait()
@@ -91,9 +103,9 @@ func part2(rows [][]tile) int {
 	return m
 }
 
-func parse(rows [][]byte) [][]tile {
-	out := make([][]tile, len(rows))
-	for i, row := range rows {
+func parse(grid [][]byte) [][]tile {
+	out := make([][]tile, len(grid))
+	for i, row := range grid {
 		r := make([]tile, len(row))
 		for j := range row {
 			r[j] = tile{row[j], 0}
