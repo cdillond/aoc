@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"slices"
+	"sync"
 )
 
 type dir uint
@@ -15,12 +17,17 @@ const (
 	west
 )
 
-type packet struct {
-	tile
+type tile struct {
+	val   byte
+	state dir
+}
+
+type beam struct {
+	index
 	dir
 }
 
-type tile struct {
+type index struct {
 	i, j int
 }
 
@@ -29,61 +36,98 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	rows := bytes.Fields(b)
-	fmt.Println("part 1: ", startAt(tile{0, 0}, east, rows))
+	rows := parse(bytes.Fields(b))
+	fmt.Println("part 1: ", startAt(beam{dir: east}, clone(rows)))
 	fmt.Println("part 2: ", part2(rows))
 }
 
-func startAt(t tile, d dir, r [][]byte) int {
-	packets := []packet{{t, d}}
-	energized := map[tile]struct{}{
-		t: {},
-	}
-	cache := map[packet]struct{}{
-		{t, d}: {},
-	}
-	for len(packets) > 0 {
-		next := []packet{}
-		for _, p := range packets {
-			nextDirs := nextDir(r[p.i][p.j], p.dir)
-			for _, d := range nextDirs {
-				nextP := step(p.tile, d)
-				if inBounds(nextP, r) {
-					if _, seen := cache[nextP]; !seen {
-						energized[nextP.tile] = struct{}{}
-						cache[nextP] = struct{}{}
-						next = append(next, nextP)
-					}
+func startAt(b beam, r [][]tile) int {
+	path := []beam{b}
+	var count int
+	for len(path) > 0 {
+		var next []beam
+		for i := range path {
+			if r[path[i].i][path[i].j].state == 0 {
+				count++
+			}
+			nextDirs := visit(path[i], r)
+			for j := range nextDirs {
+				nextBeam := step(path[i].index, nextDirs[j])
+				if nextBeam.i >= 0 && nextBeam.j >= 0 && nextBeam.i < len(r) && nextBeam.j < len(r[0]) {
+					next = append(next, nextBeam)
 				}
 			}
 		}
-		packets = next
+		path = next
 	}
-	return len(energized)
+	return count
 }
 
-func part2(rows [][]byte) int {
-	outcomes := make([]int, 0, 4*len(rows))
-	for j := range rows[0] {
-		top := startAt(tile{0, j}, south, rows)
-		bottom := startAt(tile{len(rows) - 1, j}, north, rows)
-		outcomes = append(outcomes, top, bottom)
-	}
-	for i := range rows {
-		l := startAt(tile{i, 0}, east, rows)
-		r := startAt(tile{i, len(rows[0]) - 1}, west, rows)
-		outcomes = append(outcomes, l, r)
-	}
+func part2(rows [][]tile) int {
+	out := make(chan int)
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		for j := range rows[0] {
+			out <- startAt(beam{index{0, j}, south}, clone(rows))
+			out <- startAt(beam{index{len(rows) - 1, j}, north}, clone(rows))
+		}
+		wg.Done()
+	}()
+	wg.Add(1)
+	go func() {
+		for i := range rows {
+			out <- startAt(beam{index{i, 0}, east}, clone(rows))
+			out <- startAt(beam{index{i, len(rows[0]) - 1}, west}, clone(rows))
+		}
+		wg.Done()
+		wg.Wait()
+		close(out)
+	}()
 	var m int
-	for i := range outcomes {
-		m = max(m, outcomes[i])
+	for i := range out {
+		m = max(m, i)
 	}
 	return m
 }
 
-// Returns the packet resulting from taking one step from t in the direction d.
-func step(t tile, d dir) packet {
-	return packet{tile{t.i - int(d&north) + int((d&south)>>1), t.j - int((d&west)>>3) + int((d&east))>>2}, d}
+func parse(rows [][]byte) [][]tile {
+	out := make([][]tile, len(rows))
+	for i, row := range rows {
+		r := make([]tile, len(row))
+		for j := range row {
+			r[j] = tile{row[j], 0}
+		}
+		out[i] = r
+	}
+	return out
+}
+
+// Returns the next directions for the beam to take; returns nil if the beam is out of bounds or the
+// tile has already been visited by a beam from the same direction as b.
+func visit(b beam, r [][]tile) []dir {
+	if b.i < 0 || b.j < 0 || b.i >= len(r) || b.j >= len(r[0]) {
+		return nil
+	}
+	if r[b.i][b.j].state&b.dir != 0 {
+		return nil
+	}
+	r[b.i][b.j].state |= b.dir
+	return nextDir(r[b.i][b.j].val, b.dir)
+}
+
+// Returns a copy of r and its subslices.
+func clone(r [][]tile) [][]tile {
+	out := make([][]tile, len(r))
+	for i := range r {
+		out[i] = slices.Clone(r[i])
+	}
+	return out
+}
+
+// Returns the beam resulting from taking one step from t in the direction d.
+func step(t index, d dir) beam {
+	return beam{index{t.i - int(d&north) + int((d&south)>>1), t.j - int((d&west)>>3) + int((d&east))>>2}, d}
 }
 
 // Returns the slice of directions resulting from the application of the operand b to the direction d.
@@ -113,8 +157,4 @@ func nextDir(b byte, d dir) []dir {
 		return []dir{(d&south)<<1 + (d&east)>>1} // south -> east; east -> south
 	}
 	return nil
-}
-
-func inBounds(p packet, r [][]byte) bool {
-	return p.i >= 0 && p.j >= 0 && p.i < len(r) && p.j < len(r[0])
 }
