@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"fmt"
 	"os"
-	"slices"
 	"sync"
+	"time"
 )
 
 type dir uint
+
+var empty [110][110]dir
 
 const (
 	north dir = 1 << iota
@@ -16,11 +18,6 @@ const (
 	east
 	west
 )
-
-type tile struct {
-	val   byte
-	state dir
-}
 
 type beam struct {
 	index
@@ -32,65 +29,81 @@ type index struct {
 }
 
 func main() {
+	start := time.Now()
 	b, err := os.ReadFile("input.txt")
 	if err != nil {
 		panic(err)
 	}
-	grid := parse(bytes.Fields(b))
-	fmt.Println("part 1: ", startAt(beam{dir: east}, clone(grid)))
-	fmt.Println("part 2: ", part2(grid))
+	grid := bytes.Fields(b)
+	fmt.Println("part 1: ", startAt(beam{dir: east}, grid, new([110][110]dir)))
+	fmt.Println("part 2: ", part2(grid), time.Since(start))
 }
 
-func startAt(b beam, r [][]tile) int {
+func startAt(b beam, r [][]byte, hits *[110][110]dir) int {
 	current := []beam{b}
+	pool := [2][]beam{make([]beam, 0, 64), make([]beam, 0, 64)}
 	var count int
+	var i int
 	for len(current) > 0 {
-		var next []beam
-		for i := range current {
-			if r[current[i].i][current[i].j].state == 0 {
+		next := pool[i%2]
+		for _, c := range current {
+			if hits[c.i][c.j] == 0 {
 				count++
 			}
-			nextDirs := visit(current[i], r)
+			if !visit(c, hits) {
+				continue
+			}
+			nextDirs := nextDir(r[c.i][c.j], c.dir)
 			for j := range nextDirs {
-				nextBeam := step(current[i].index, nextDirs[j])
+				nextBeam := step(c.index, nextDirs[j])
 				if nextBeam.i >= 0 && nextBeam.j >= 0 && nextBeam.i < len(r) && nextBeam.j < len(r[0]) {
 					next = append(next, nextBeam)
 				}
 			}
 		}
+		pool[(i+1)%2] = pool[(i+1)%2][:0]
 		current = next
+		i++
 	}
 	return count
 }
 
-func part2(grid [][]tile) int {
+func part2(grid [][]byte) int {
 	out := make(chan int)
 	var wg sync.WaitGroup
 	wg.Add(1)
 	go func() {
+		var h [110][110]dir
 		for j := range grid[0] {
-			out <- startAt(beam{index{0, j}, south}, clone(grid))
+			out <- startAt(beam{index{0, j}, south}, grid, &h)
+			copy(h[:], empty[:])
 		}
 		wg.Done()
 	}()
 	wg.Add(1)
 	go func() {
+		var h [110][110]dir
 		for j := range grid[0] {
-			out <- startAt(beam{index{len(grid) - 1, j}, north}, clone(grid))
+			out <- startAt(beam{index{len(grid) - 1, j}, north}, grid, &h)
+			copy(h[:], empty[:])
 		}
 		wg.Done()
 	}()
 	wg.Add(1)
 	go func() {
+		var h [110][110]dir
 		for i := range grid {
-			out <- startAt(beam{index{i, 0}, east}, clone(grid))
+			out <- startAt(beam{index{i, 0}, east}, grid, &h)
+			copy(h[:], empty[:])
 		}
 		wg.Done()
 	}()
 	wg.Add(1)
 	go func() {
+		var h [110][110]dir
 		for i := range grid {
-			out <- startAt(beam{index{i, len(grid[0]) - 1}, west}, clone(grid))
+			out <- startAt(beam{index{i, len(grid[0]) - 1}, west}, grid, &h)
+			copy(h[:], empty[:])
 		}
 		wg.Done()
 		wg.Wait()
@@ -103,38 +116,13 @@ func part2(grid [][]tile) int {
 	return m
 }
 
-func parse(grid [][]byte) [][]tile {
-	out := make([][]tile, len(grid))
-	for i, row := range grid {
-		r := make([]tile, len(row))
-		for j := range row {
-			r[j] = tile{row[j], 0}
-		}
-		out[i] = r
+// Returns true if the index has not been visited yet by an identical beam.
+func visit(b beam, h *[110][110]dir) bool {
+	if h[b.i][b.j]&b.dir != 0 {
+		return false
 	}
-	return out
-}
-
-// Returns the next directions for the beam to take; returns nil if the beam is out of bounds or the
-// tile has already been visited by a beam from the same direction as b.
-func visit(b beam, r [][]tile) []dir {
-	if b.i < 0 || b.j < 0 || b.i >= len(r) || b.j >= len(r[0]) {
-		return nil
-	}
-	if r[b.i][b.j].state&b.dir != 0 {
-		return nil
-	}
-	r[b.i][b.j].state |= b.dir
-	return nextDir(r[b.i][b.j].val, b.dir)
-}
-
-// Returns a copy of r and its subslices.
-func clone(r [][]tile) [][]tile {
-	out := make([][]tile, len(r))
-	for i := range r {
-		out[i] = slices.Clone(r[i])
-	}
-	return out
+	h[b.i][b.j] |= b.dir
+	return true
 }
 
 // Returns the beam resulting from taking one step from t in the direction d.
