@@ -71,7 +71,7 @@ func main() {
 func loadInput(day, year int, path string) error {
 	token := os.Getenv("AOC_TOKEN")
 	if token == "" {
-		log.Fatalln("unable to obtain session cookie")
+		return errors.New("unable to obtain session cookie")
 	}
 	cli := aoc.NewClient(day, year, token)
 	f, err := os.Create(path)
