@@ -3,13 +3,17 @@ package d1
 import (
 	"aoc"
 	"bufio"
-	"os"
+	"embed"
+	"io/fs"
 	"strconv"
 )
 
+//go:embed *.txt
+var dir embed.FS
+
 func Part1(path string) (res string, err error) {
-	var f *os.File
-	if f, err = os.Open(path); err != nil {
+	var f fs.File
+	if f, err = dir.Open(path); err != nil {
 		return res, err
 	}
 	defer f.Close()
@@ -36,8 +40,8 @@ func Part1(path string) (res string, err error) {
 	return strconv.Itoa(count), nil
 }
 func Part2(path string) (res string, err error) {
-	var f *os.File
-	if f, err = os.Open(path); err != nil {
+	var f fs.File
+	if f, err = dir.Open(path); err != nil {
 		return res, err
 	}
 	defer f.Close()

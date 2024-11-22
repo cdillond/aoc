@@ -120,7 +120,7 @@ func writefile(year int, defined []expfunc, imports []string) string {
 
 	bldr.WriteString("}\n\n")
 
-	bldr.WriteString(`func Solve(path string, day, part int) (string, error) {
+	bldr.WriteString(`func Solve(day, part int) (string, error) {
 	if part != 1 && part != 2 {
 		return "", aoc.ErrUndefined
 	}
@@ -128,7 +128,7 @@ func writefile(year int, defined []expfunc, imports []string) string {
 		return "", aoc.ErrUndefined
 	}
 	if sol := solutions[day-1][part-1]; sol != nil {
-		return sol(path)
+		return sol("input.txt")
 	}
 	return "", aoc.ErrUndefined
 }

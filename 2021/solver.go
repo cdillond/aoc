@@ -23,7 +23,7 @@ func init() {
 	solutions[2][1] = d3.Part2
 }
 
-func Solve(path string, day, part int) (string, error) {
+func Solve(day, part int) (string, error) {
 	if part != 1 && part != 2 {
 		return "", aoc.ErrUndefined
 	}
@@ -31,7 +31,7 @@ func Solve(path string, day, part int) (string, error) {
 		return "", aoc.ErrUndefined
 	}
 	if sol := solutions[day-1][part-1]; sol != nil {
-		return sol(path)
+		return sol("input.txt")
 	}
 	return "", aoc.ErrUndefined
 }

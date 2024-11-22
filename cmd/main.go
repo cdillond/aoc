@@ -32,21 +32,20 @@ func main() {
 		log.Fatalln("invalid part")
 	}
 
-	path := "../" + strconv.Itoa(year) + "/d" + strconv.Itoa(day) + "/input.txt"
-
 	var (
 		res string
 		err error
 	)
 
 	if get {
+		path := "../" + strconv.Itoa(year) + "/d" + strconv.Itoa(day) + "/input.txt"
 		if err = loadInput(day, year, path); err != nil {
 			log.Fatalln(err)
 		}
 		return
 	}
 
-	if res, err = y21.Solve(path, day, part); err != nil {
+	if res, err = y21.Solve(day, part); err != nil {
 		log.Fatalln(err)
 	}
 	fmt.Println(res)

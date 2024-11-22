@@ -4,12 +4,16 @@ import (
 	"aoc"
 	"bufio"
 	"bytes"
-	"os"
+	"embed"
+	"io/fs"
 )
 
+//go:embed *.txt
+var dir embed.FS
+
 func Part1(path string) (res string, err error) {
-	var f *os.File
-	if f, err = os.Open(path); err != nil {
+	var f fs.File
+	if f, err = dir.Open(path); err != nil {
 		return res, err
 	}
 	defer f.Close()
@@ -35,8 +39,8 @@ func Part1(path string) (res string, err error) {
 	return aoc.Itoa(h * d), nil
 }
 func Part2(path string) (res string, err error) {
-	var f *os.File
-	if f, err = os.Open(path); err != nil {
+	var f fs.File
+	if f, err = dir.Open(path); err != nil {
 		return res, err
 	}
 	defer f.Close()
