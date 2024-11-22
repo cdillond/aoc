@@ -8,13 +8,11 @@ import (
 	"log"
 	"os"
 	"strconv"
+
+	y21 "aoc/2021"
 )
 
-// these values will depend on the build tags
-var (
-	base string
-	year int
-)
+var year int = 2021
 
 func main() {
 	var (
@@ -34,7 +32,7 @@ func main() {
 		log.Fatalln("invalid part")
 	}
 
-	path := base + "d" + strconv.Itoa(day) + "/input.txt"
+	path := "../" + strconv.Itoa(year) + "/d" + strconv.Itoa(day) + "/input.txt"
 
 	var (
 		res string
@@ -48,16 +46,9 @@ func main() {
 		return
 	}
 
-	solution := aoc.Problems[day-1][part-1]
-	if solution != nil {
-		res, err = solution(path)
-		if err != nil {
-			log.Fatalln(err)
-		}
-	} else {
-		log.Fatalln("the requested function has not yet been added to aoc.Problems.")
+	if res, err = y21.Solve(path, day, part); err != nil {
+		log.Fatalln(err)
 	}
-
 	fmt.Println(res)
 
 	if submit {
