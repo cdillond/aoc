@@ -7,67 +7,66 @@ import (
 	"strconv"
 )
 
-func init() {
-	aoc.Problems[0][0] = Part1
-	aoc.Problems[0][1] = Part2
-}
-
-func Part1(path string) (string, error) {
-	f, err := os.Open(path)
-	if err != nil {
-		return "", err
-	}
-	defer f.Close()
-
-	scanner := bufio.NewScanner(f)
-
-	var cur, prev, i, count int
-	for ; scanner.Scan(); i++ {
-		prev = cur
-		if cur, err = strconv.Atoi(scanner.Text()); err != nil {
-			return "", err
-		}
-		if i > 0 && cur > prev {
-			count++
-		}
-	}
-
-	return strconv.Itoa(count), nil
-}
-func Part2(path string) (string, error) {
-	var (
-		f   *os.File
-		err error
-		res string
-	)
+func Part1(path string) (res string, err error) {
+	var f *os.File
 	if f, err = os.Open(path); err != nil {
 		return res, err
 	}
 	defer f.Close()
 
 	scanner := bufio.NewScanner(f)
+
+	var cur, prev, count int
+	if !scanner.Scan() {
+		return res, scanner.Err()
+	}
+	if cur, err = aoc.A2i(scanner.Bytes()); err != nil {
+		return res, err
+	}
+	for scanner.Scan() {
+		prev = cur
+		if cur, err = aoc.A2i(scanner.Bytes()); err != nil {
+			return "", err
+		}
+		if cur > prev {
+			count++
+		}
+	}
+
+	return strconv.Itoa(count), nil
+}
+func Part2(path string) (res string, err error) {
+	var f *os.File
+	if f, err = os.Open(path); err != nil {
+		return res, err
+	}
+	defer f.Close()
+
+	scanner := bufio.NewScanner(f)
+	// there's no need to track more than the 4 most recent values.
+	rows := make([]int, 4)
 	var (
-		rows      []int
 		i, n, sum int
 		count     int
 	)
 
 	for ; i < 3; i++ {
 		scanner.Scan()
-		if n, err = strconv.Atoi(scanner.Text()); err != nil {
+		if n, err = aoc.A2i(scanner.Bytes()); err != nil {
 			return res, err
 		}
-		rows = append(rows, n)
+		rows[i] = n
 		sum += n
 	}
 
 	for scanner.Scan() {
-		if n, err = strconv.Atoi(scanner.Text()); err != nil {
+		if n, err = aoc.A2i(scanner.Bytes()); err != nil {
 			return res, err
 		}
-		rows = append(rows, n)
+		rows[i&3] = n // i&3 == i%4
 
-		n = n - rows[i-3]
+		// n can be reused to represent the difference between window sums
+		n = n - rows[(i-3)&3]
 		if n > 0 {
 			count++
 		}
@@ -75,6 +74,5 @@ func Part2(path string) (string, error) {
 		sum += n
 		i++
 	}
-
 	return strconv.Itoa(count), nil
 }

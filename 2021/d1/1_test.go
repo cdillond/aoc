@@ -19,9 +19,7 @@ func TestPart1(t *testing.T) {
 		if err != nil {
 			t.Log(err)
 		}
-
 	}
-
 }
 
 func TestPart2(t *testing.T) {
@@ -38,7 +36,5 @@ func TestPart2(t *testing.T) {
 		if err != nil {
 			t.Log(err)
 		}
-
 	}
-
 }

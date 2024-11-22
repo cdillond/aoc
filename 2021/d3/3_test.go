@@ -1,4 +1,4 @@
-package d2
+package d3
 
 import (
 	"aoc"
@@ -7,7 +7,7 @@ import (
 
 func TestPart1(t *testing.T) {
 	examples := []aoc.Example{
-		{Path: "example.txt", Want: "150"},
+		{Path: "example.txt", Want: ""},
 	}
 
 	for _, ex := range examples {
@@ -24,7 +24,7 @@ func TestPart1(t *testing.T) {
 
 func TestPart2(t *testing.T) {
 	examples := []aoc.Example{
-		{Path: "example.txt", Want: "900"},
+		{Path: "example.txt", Want: ""},
 	}
 
 	for _, ex := range examples {
