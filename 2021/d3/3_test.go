@@ -24,7 +24,7 @@ func TestPart1(t *testing.T) {
 
 func TestPart2(t *testing.T) {
 	examples := []aoc.Example{
-		{Path: "example.txt", Want: ""},
+		{Path: "example.txt", Want: "230"},
 	}
 
 	for _, ex := range examples {
