@@ -12,25 +12,26 @@ import (
 
 type solution func(string) (string, error)
 
-var solutions [25][2]solution
-
-func init() {
-	solutions[0][0] = d1.Part1
-	solutions[0][1] = d1.Part2
-	solutions[1][0] = d2.Part1
-	solutions[1][1] = d2.Part2
-	solutions[2][0] = d3.Part1
-	solutions[2][1] = d3.Part2
-}
-
 func Solve(day, part int) (string, error) {
 	if part != 1 && part != 2 {
 		return "", aoc.ErrUndefined
 	}
-	if day-1 >= len(solutions) {
+	if day > 25 {
 		return "", aoc.ErrUndefined
 	}
-	if solve := solutions[day-1][part-1]; solve != nil {
+	day--
+	part--
+
+	solutions := [50]solution{
+		0: d1.Part1,
+		1: d1.Part2,
+		2: d2.Part1,
+		3: d2.Part2,
+		4: d3.Part1,
+		5: d3.Part2,
+	}
+
+	if solve := solutions[(2*day)+part]; solve != nil {
 		return solve("input.txt")
 	}
 	return "", aoc.ErrUndefined

@@ -104,8 +104,17 @@ func buildContent(year int, defined []solutionFunc, imports []string) string {
 	}
 	bldr.WriteString(")\n\n")
 	bldr.WriteString("type solution func(string) (string, error)\n\n")
-	bldr.WriteString("var solutions [25][2]solution\n\n")
-	bldr.WriteString("func init() {\n")
+
+	bldr.WriteString(`func Solve(day, part int) (string, error) {
+	if part != 1 && part != 2 {
+		return "", aoc.ErrUndefined
+	}
+	if day > 25 {
+		return "", aoc.ErrUndefined
+	}
+	day--
+	part--`)
+	bldr.WriteString("\n\n\tsolutions := [50]solution{\n")
 	for _, def := range defined {
 		day, err := strconv.Atoi(def.pkgName[1:])
 		if err != nil {
@@ -116,25 +125,16 @@ func buildContent(year int, defined []solutionFunc, imports []string) string {
 		if def.funcName == "Part2" {
 			part = 1
 		}
-		bldr.WriteString("\tsolutions[" + strconv.Itoa(day) + "][" + strconv.Itoa(part) + "] = " + def.pkgName + "." + def.funcName + "\n")
+		bldr.WriteString("\t\t" + strconv.Itoa(day*2+part) + ": " + def.pkgName + "." + def.funcName + ",\n")
 	}
-
-	bldr.WriteString("}\n\n")
-
-	bldr.WriteString(`func Solve(day, part int) (string, error) {
-	if part != 1 && part != 2 {
-		return "", aoc.ErrUndefined
-	}
-	if day-1 >= len(solutions) {
-		return "", aoc.ErrUndefined
-	}
-	if solve := solutions[day-1][part-1]; solve != nil {
+	bldr.WriteString("\t}\n")
+	bldr.WriteString(`
+	if solve := solutions[(2*day)+part]; solve != nil {
 		return solve("input.txt")
 	}
 	return "", aoc.ErrUndefined
-}
-
-`)
+}`)
+	bldr.WriteString("\n")
 
 	return bldr.String()
 }

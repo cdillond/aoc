@@ -38,6 +38,7 @@ func Part1(path string) (res string, err error) {
 
 	return aoc.Itoa(h * d), nil
 }
+
 func Part2(path string) (res string, err error) {
 	var f fs.File
 	if f, err = dir.Open(path); err != nil {
