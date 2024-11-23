@@ -4,13 +4,9 @@ import (
 	"aoc"
 	"bufio"
 	"bytes"
-	"embed"
 	"io"
-	"io/fs"
+	"os"
 )
-
-//go:embed *.txt
-var dir embed.FS
 
 func countOnes(ones []int, line []byte) {
 	_ = line[len(ones)-1]
@@ -22,8 +18,8 @@ func countOnes(ones []int, line []byte) {
 }
 
 func Part1(path string) (res string, err error) {
-	var f fs.File
-	if f, err = dir.Open(path); err != nil {
+	var f *os.File
+	if f, err = os.Open(path); err != nil {
 		return res, err
 	}
 	defer f.Close()
@@ -60,8 +56,8 @@ func Part1(path string) (res string, err error) {
 }
 
 func Part2(path string) (res string, err error) {
-	var f fs.File
-	if f, err = dir.Open(path); err != nil {
+	var f *os.File
+	if f, err = os.Open(path); err != nil {
 		return res, err
 	}
 	defer f.Close()

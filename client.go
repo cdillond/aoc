@@ -47,7 +47,7 @@ func (c Client) GetInput(w io.Writer) error {
 
 func (c Client) Submit(part int, answer string, w io.Writer) error {
 	if part != 1 && part != 2 {
-		return fmt.Errorf("invalid part (%d); must be 1 or 2.", part)
+		return fmt.Errorf("invalid part (%d); must be 1 or 2", part)
 	}
 
 	form := url.Values{}
