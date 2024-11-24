@@ -1,40 +1,29 @@
 package d2
 
 import (
-	"aoc"
 	"testing"
 )
 
 func TestPart1(t *testing.T) {
-	examples := []aoc.Example{
-		{Path: "example.txt", Want: "150"},
+	want := "150"
+	have, err := Part1("example.txt")
+	if have != want {
+		t.Logf("have: %s, want: %s\n", have, want)
+		t.Fail()
 	}
-
-	for _, ex := range examples {
-		have, err := Part1(ex.Path)
-		if have != ex.Want {
-			t.Logf("have: %s, want: %s\n", have, ex.Want)
-			t.Fail()
-		}
-		if err != nil {
-			t.Log(err)
-		}
+	if err != nil {
+		t.Log(err)
 	}
 }
 
 func TestPart2(t *testing.T) {
-	examples := []aoc.Example{
-		{Path: "example.txt", Want: "900"},
+	want := "900"
+	have, err := Part2("example.txt")
+	if have != want {
+		t.Logf("have: %s, want: %s\n", have, want)
+		t.Fail()
 	}
-
-	for _, ex := range examples {
-		have, err := Part2(ex.Path)
-		if have != ex.Want {
-			t.Logf("have: %s, want: %s\n", have, ex.Want)
-			t.Fail()
-		}
-		if err != nil {
-			t.Log(err)
-		}
+	if err != nil {
+		t.Log(err)
 	}
 }

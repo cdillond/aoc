@@ -4,7 +4,6 @@ import (
 	"aoc"
 	"bufio"
 	"os"
-	"strconv"
 )
 
 func Part1(path string) (res string, err error) {
@@ -33,7 +32,7 @@ func Part1(path string) (res string, err error) {
 		}
 	}
 
-	return strconv.Itoa(count), nil
+	return aoc.Itoa(count), nil
 }
 func Part2(path string) (res string, err error) {
 	var f *os.File
@@ -74,5 +73,5 @@ func Part2(path string) (res string, err error) {
 		sum += n
 		i++
 	}
-	return strconv.Itoa(count), nil
+	return aoc.Itoa(count), nil
 }

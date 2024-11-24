@@ -1,21 +1,17 @@
 package main
 
 import (
-	"aoc"
+	"aoc/cmd/client"
 	"errors"
 	"flag"
 	"fmt"
 	"log"
 	"os"
 	"strconv"
-
-	y21 "aoc/2021"
 )
 
-// Set this var (as well as the correct import) prior to building.
-var year int = 2021
-
 func main() {
+	// flag variables
 	var (
 		day, part       int
 		submit, get, mk bool
@@ -30,10 +26,11 @@ func main() {
 	if day < 1 || day > 25 {
 		log.Fatalln("invalid day")
 	}
-	path := "../inputs/" + strconv.Itoa(year) + "/" + strconv.Itoa(day) + ".txt"
+	dayStr := strconv.Itoa(day)
+	path := inputDir + dayStr + ".txt"
 	var err error
 	if mk {
-		if err = mkTemplate(day); err != nil {
+		if err = mkTemplate(dayStr); err != nil {
 			log.Fatalln(err)
 		}
 		return
@@ -51,25 +48,34 @@ func main() {
 	}
 
 	var res string
-	if res, err = y21.Solve(day, part, path); err != nil {
+	if res, err = solve(day, part, path); err != nil {
 		log.Fatalln(err)
 	}
-	fmt.Println(res)
 
 	if submit {
+		log.Println("solution: ", res)
 		if err := submitResult(day, year, part, res); err != nil {
 			log.Fatalln(err)
 		}
+		return
 	}
 
+	fmt.Println(res)
+}
+
+func newClient(day, year int) (cli client.Client, err error) {
+	token := os.Getenv("AOC_SESSION")
+	if token == "" {
+		return cli, errors.New("unable to obtain session cookie")
+	}
+	return client.New(day, year, token), nil
 }
 
 func loadInput(day, year int, path string) error {
-	token := os.Getenv("AOC_TOKEN")
-	if token == "" {
-		return errors.New("unable to obtain session cookie")
+	cli, err := newClient(day, year)
+	if err != nil {
+		return err
 	}
-	cli := aoc.NewClient(day, year, token)
 	f, err := os.Create(path)
 	if err != nil {
 		return err
@@ -80,10 +86,9 @@ func loadInput(day, year int, path string) error {
 }
 
 func submitResult(day, year, part int, res string) error {
-	token := os.Getenv("AOC_TOKEN")
-	if token == "" {
-		return errors.New("unable to obtain session cookie")
+	cli, err := newClient(day, year)
+	if err != nil {
+		return err
 	}
-	cli := aoc.NewClient(day, year, token)
 	return cli.Submit(part, res, os.Stdout)
 }

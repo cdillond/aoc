@@ -1,9 +1,14 @@
 package aoc
 
+//go:generate go run gen.go
+
 import (
+	"errors"
 	"strconv"
 	"unsafe"
 )
+
+var ErrUndefined = errors.New("no solution found")
 
 func Atoi(b []byte) int {
 	n, err := strconv.ParseInt(unsafe.String(unsafe.SliceData(b), len(b)), 10, 64)

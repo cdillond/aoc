@@ -1,4 +1,4 @@
-package aoc
+package client
 
 import (
 	"fmt"
@@ -11,7 +11,7 @@ import (
 
 const BaseURL = "https://adventofcode.com/"
 
-func NewClient(day, year int, token string) Client {
+func New(day, year int, token string) Client {
 	return Client{
 		Day:   strconv.Itoa(day),
 		Year:  strconv.Itoa(year),

@@ -8,6 +8,7 @@ import (
 	"aoc/2021/d1"
 	"aoc/2021/d2"
 	"aoc/2021/d3"
+	"aoc/2021/d10"
 )
 
 type solution func(string) (string, error)
@@ -27,6 +28,8 @@ func Solve(day, part int, path string) (string, error) {
 		3:	d2.Part2,
 		4:	d3.Part1,
 		5:	d3.Part2,
+		18:	d10.Part1,
+		19:	d10.Part2,
 	}
 
 	i := (2 * day) + part
