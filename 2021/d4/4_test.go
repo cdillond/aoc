@@ -1,11 +1,11 @@
-package d1
+package d4
 
 import (
 	"testing"
 )
 
 func TestPart1(t *testing.T) {
-	want := ""
+	want := "4512"
 	have, err := Part1("example.txt")
 	if have != want {
 		t.Logf("have: %s, want: %s\n", have, want)
@@ -17,7 +17,7 @@ func TestPart1(t *testing.T) {
 }
 
 func TestPart2(t *testing.T) {
-	want := ""
+	want := "1924"
 	have, err := Part2("example.txt")
 	if have != want {
 		t.Logf("have: %s, want: %s\n", have, want)

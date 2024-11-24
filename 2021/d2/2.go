@@ -7,6 +7,11 @@ import (
 	"os"
 )
 
+const (
+	Day  = "2"
+	Year = "2021"
+)
+
 func Part1(path string) (res string, err error) {
 	var f *os.File
 	if f, err = os.Open(path); err != nil {

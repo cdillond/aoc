@@ -1,27 +1,32 @@
 package client
 
 import (
-	"fmt"
+	"errors"
 	"io"
 	"net/http"
 	"net/url"
-	"strconv"
+	"os"
 	"strings"
 )
 
 const BaseURL = "https://adventofcode.com/"
 
-func New(day, year int, token string) Client {
-	return Client{
-		Day:   strconv.Itoa(day),
-		Year:  strconv.Itoa(year),
-		Token: token,
-	}
-}
-
 type Client struct {
 	Day, Year string
 	Token     string
+}
+
+func New(day, year string) (Client, error) {
+	token := os.Getenv("AOC_SESSION")
+	if token == "" {
+		return Client{}, errors.New("unable to obtain session cookie")
+	}
+
+	return Client{
+		Day:   day,
+		Year:  year,
+		Token: token,
+	}, nil
 }
 
 func (c Client) GetInput(w io.Writer) error {
@@ -45,13 +50,9 @@ func (c Client) GetInput(w io.Writer) error {
 	return err
 }
 
-func (c Client) Submit(part int, answer string, w io.Writer) error {
-	if part != 1 && part != 2 {
-		return fmt.Errorf("invalid part (%d); must be 1 or 2", part)
-	}
-
+func (c Client) Submit(part, answer string, w io.Writer) error {
 	form := url.Values{}
-	form.Add("level", strconv.Itoa(part))
+	form.Add("level", part)
 	form.Add("answer", answer)
 
 	req, err := http.NewRequest(http.MethodPost, BaseURL+c.Year+"/day/"+c.Day+"/answer", strings.NewReader(form.Encode()))
