@@ -11,12 +11,7 @@ import (
 	"path"
 
 	// Update this import path when solving a new problem
-	prob "aoc/2021/d4"
-)
-
-const (
-	one = false
-	two = true
+	prob "aoc/2021/d5"
 )
 
 func main() {
@@ -41,11 +36,11 @@ func main() {
 	var res string
 
 	switch part {
-	case one:
+	case false:
 		if res, err = prob.Part1(input); err != nil {
 			log.Fatalln(err)
 		}
-	case two:
+	case true:
 		if res, err = prob.Part2(input); err != nil {
 			log.Fatalln(err)
 		}

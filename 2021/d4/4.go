@@ -21,12 +21,12 @@ func parseFirstLine(b []byte) []int {
 	return out
 }
 
-type bufr struct {
+type buf struct {
 	data []byte
 	n    int
 }
 
-func (b *bufr) next() []byte {
+func (b *buf) next() []byte {
 	// get start
 	for b.n < len(b.data) && b.data[b.n] == ' ' {
 		b.n++
@@ -43,7 +43,7 @@ func (b *bufr) next() []byte {
 func parseGrid(scanner *bufio.Scanner) [][]int {
 	out := make([][]int, 5)
 	for i := 0; i < 5 && scanner.Scan(); i++ {
-		buf := bufr{data: scanner.Bytes()}
+		buf := buf{data: scanner.Bytes()}
 
 		for buf.n < len(buf.data) {
 			out[i] = append(out[i], aoc.Atoi(buf.next()))
@@ -63,7 +63,6 @@ func unmarkedSum(nums []int, g grid) int {
 			}
 		}
 	}
-
 	return sum
 }
 
@@ -161,7 +160,7 @@ func Part2(path string) (res string, err error) {
 					if len(set) == len(grids) {
 						return aoc.Itoa(num * unmarkedSum(nums[:count], grids[i])), nil
 					}
-
+					break
 				}
 			}
 		}
