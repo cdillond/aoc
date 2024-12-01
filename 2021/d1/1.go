@@ -1,9 +1,10 @@
 package d1
 
 import (
-	"aoc"
 	"bufio"
 	"os"
+
+	"github.com/cdillond/aoc"
 )
 
 const (

@@ -1,10 +1,11 @@
 package d5
 
 import (
-	"aoc"
 	"bufio"
 	"bytes"
 	"os"
+
+	"github.com/cdillond/aoc"
 )
 
 const (

@@ -1,10 +1,11 @@
 package d4
 
 import (
-	"aoc"
 	"bufio"
 	"bytes"
 	"os"
+
+	"github.com/cdillond/aoc"
 )
 
 const (

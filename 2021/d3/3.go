@@ -1,11 +1,12 @@
 package d3
 
 import (
-	"aoc"
 	"bufio"
 	"bytes"
 	"io"
 	"os"
+
+	"github.com/cdillond/aoc"
 )
 
 func countOnes(ones []int, line []byte) {

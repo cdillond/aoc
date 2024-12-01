@@ -1,8 +1,6 @@
 package main
 
 import (
-	"aoc/cmd/client"
-	"aoc/cmd/html"
 	"bytes"
 	"flag"
 	"fmt"
@@ -10,24 +8,29 @@ import (
 	"os"
 	"path"
 
+	"github.com/cdillond/aoc/cmd/client"
+	"github.com/cdillond/aoc/cmd/html"
+
 	// Update this import path when solving a new problem
-	prob "aoc/2021/d5"
+	puzzle "github.com/cdillond/aoc/2021/d5"
 )
 
 func main() {
 	// flag variables
 	var part, submit, get bool
-	flag.BoolVar(&part, "t", false, "part two")
+	//flag.BoolVar(&part, "2", false, "part two")
 	flag.BoolVar(&submit, "submit", false, "submit answer to advent of code")
 	flag.BoolVar(&get, "get", false, "download puzzle input")
 	flag.Parse()
 
+	part = flag.Arg(0) == "2"
+
 	var err error
 
-	input := path.Join("..", "inputs", prob.Year, prob.Day+".txt")
+	input := path.Join("..", "inputs", puzzle.Year, puzzle.Day+".txt")
 
 	if get {
-		if err = loadInput(prob.Day, prob.Year, input); err != nil {
+		if err = loadInput(puzzle.Day, puzzle.Year, input); err != nil {
 			log.Fatalln(err)
 		}
 		return
@@ -37,18 +40,18 @@ func main() {
 
 	switch part {
 	case false:
-		if res, err = prob.Part1(input); err != nil {
+		if res, err = puzzle.Part1(input); err != nil {
 			log.Fatalln(err)
 		}
 	case true:
-		if res, err = prob.Part2(input); err != nil {
+		if res, err = puzzle.Part2(input); err != nil {
 			log.Fatalln(err)
 		}
 	}
 
 	if submit {
 		log.Println("solution: ", res)
-		if err := submitResult(partToStr(part), prob.Day, prob.Year, res); err != nil {
+		if err := submitResult(partToStr(part), puzzle.Day, puzzle.Year, res); err != nil {
 			log.Fatalln(err)
 		}
 		return
