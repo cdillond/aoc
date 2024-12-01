@@ -5,6 +5,13 @@ import (
 	"unsafe"
 )
 
+func Abs(n int) int {
+	if n < 0 {
+		n = -n
+	}
+	return n
+}
+
 func Atoi(b []byte) int {
 	n, err := strconv.ParseInt(unsafe.String(unsafe.SliceData(b), len(b)), 10, 64)
 	if err != nil {

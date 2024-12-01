@@ -12,13 +12,13 @@ import (
 	"github.com/cdillond/aoc/cmd/html"
 
 	// Update this import path when solving a new problem
-	puzzle "github.com/cdillond/aoc/2021/d5"
+	puzzle "github.com/cdillond/aoc/2024/d1"
 )
 
 func main() {
 	// flag variables
 	var part, submit, get bool
-	//flag.BoolVar(&part, "2", false, "part two")
+
 	flag.BoolVar(&submit, "submit", false, "submit answer to advent of code")
 	flag.BoolVar(&get, "get", false, "download puzzle input")
 	flag.Parse()
