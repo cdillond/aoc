@@ -1,10 +1,30 @@
 package {{ .PackageName }}
 
+import (
+	"os"
+)
+
 const (
 	Day  = "{{ .Day }}"
 	Year = "{{ .Year }}"
 )
 
-func Part1(path string) (res string, err error) {return}
+func Part1(path string) (res string, err error) {
+	var f *os.File
+	if f, err = os.Open(path); err != nil {
+		return res, err
+	}
+	defer f.Close()
 
-func Part2(path string) (res string, err error) {return}
+	return
+}
+
+func Part2(path string) (res string, err error) {
+	var f *os.File
+	if f, err = os.Open(path); err != nil {
+		return res, err
+	}
+	defer f.Close()
+	
+	return
+}
