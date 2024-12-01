@@ -19,11 +19,15 @@ func Part1(path string) (res string, err error) {
 	if f, err = os.Open(path); err != nil {
 		return res, err
 	}
+	defer f.Close()
+
+	left, right := make([]int, 0, 1024), make([]int, 0, 1024)
 
 	scanner := bufio.NewScanner(f)
-	var left, right []int
+
+	var before, after []byte
 	for scanner.Scan() {
-		before, after, _ := bytes.Cut(scanner.Bytes(), []byte("   "))
+		before, after, _ = bytes.Cut(scanner.Bytes(), []byte("   "))
 		left = append(left, aoc.Atoi(before))
 		right = append(right, aoc.Atoi(after))
 	}
@@ -32,8 +36,8 @@ func Part1(path string) (res string, err error) {
 	slices.Sort(right)
 
 	var distance int
-	for i := range left {
-		distance += aoc.Abs(left[i] - right[i])
+	for j := range left {
+		distance += aoc.Abs(left[j] - right[j])
 	}
 
 	return aoc.Itoa(distance), nil
@@ -44,34 +48,25 @@ func Part2(path string) (res string, err error) {
 	if f, err = os.Open(path); err != nil {
 		return res, err
 	}
+	defer f.Close()
 
+	left, right := make([]int, 0, 1024), make([]int, 0, 1024)
 	scanner := bufio.NewScanner(f)
-	var left, right []int
 	for scanner.Scan() {
 		before, after, _ := bytes.Cut(scanner.Bytes(), []byte("   "))
 		left = append(left, aoc.Atoi(before))
 		right = append(right, aoc.Atoi(after))
 	}
 
-	seen := make(map[int]int, len(left))
-
-	var (
-		total int
-		count int
-		ok    bool
-	)
-	for _, n := range left {
-		if count, ok = seen[n]; ok {
-			total += count * n
-			continue
-		}
-		for _, v := range right {
-			if n == v {
+	var total int
+	for _, l := range left {
+		var count int
+		for _, r := range right {
+			if l == r {
 				count++
 			}
 		}
-		seen[n] = count
-		total += count * n
+		total += count * l
 	}
 
 	return aoc.Itoa(total), nil

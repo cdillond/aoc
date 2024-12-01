@@ -16,6 +16,15 @@ func TestPart1(t *testing.T) {
 	}
 }
 
+func BenchmarkPart1(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_, err := Part1("../../inputs/2024/1.txt")
+		if err != nil {
+			b.Log(err)
+		}
+	}
+}
+
 func TestPart2(t *testing.T) {
 	want := "31"
 	have, err := Part2("example.txt")
@@ -25,5 +34,14 @@ func TestPart2(t *testing.T) {
 	}
 	if err != nil {
 		t.Log(err)
+	}
+}
+
+func BenchmarkPart2(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_, err := Part2("../../inputs/2024/1.txt")
+		if err != nil {
+			b.Log(err)
+		}
 	}
 }
