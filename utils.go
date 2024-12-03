@@ -34,3 +34,40 @@ func Stoi(s string) int {
 }
 
 func Itoa(n int) string { return strconv.FormatInt(int64(n), 10) }
+
+func ParseInts(b []byte, nums []int) ([]int, error) {
+	var (
+		a, z, n int
+		c       byte
+		err     error
+	)
+
+loop:
+	for ; a < len(b); a++ {
+		c = b[a]
+		if c != 0x20 && c != '\t' {
+			break
+		}
+	}
+	if a == len(b) {
+		return nums, nil
+	}
+	for z = a + 1; z < len(b); z++ {
+		c = b[z]
+		if c == 0x20 || c == '\t' {
+			break
+		}
+	}
+
+	if n, err = A2i(b[a:z]); err != nil {
+		return nums, err
+	}
+	nums = append(nums, n)
+	if z < len(b) {
+		a = z + 1
+		goto loop
+	}
+
+	return nums, nil
+
+}
