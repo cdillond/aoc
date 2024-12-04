@@ -2,4 +2,5 @@ cmd/cmd
 template/template
 *.txt
 *.html
+*.prof
 *.code-workspace

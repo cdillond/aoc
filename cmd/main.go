@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"runtime/pprof"
 	"time"
 
 	"github.com/cdillond/aoc/cmd/client"
@@ -18,12 +19,25 @@ import (
 
 func main() {
 	// flag variables
-	var part, submit, get, clock bool
+	var part, submit, get, clock, prof bool
 
 	flag.BoolVar(&submit, "submit", false, "submit answer to advent of code")
 	flag.BoolVar(&get, "get", false, "download puzzle input")
 	flag.BoolVar(&clock, "time", false, "measure and print the time taken to execute the solution function")
+	flag.BoolVar(&prof, "prof", false, "run a profile")
 	flag.Parse()
+
+	if prof {
+		out, err := os.Create("cpu.prof")
+		if err != nil {
+			log.Fatalln(err)
+		}
+		defer out.Close()
+		if err = pprof.StartCPUProfile(out); err != nil {
+			log.Fatalln(err)
+		}
+		defer pprof.StopCPUProfile()
+	}
 
 	part = flag.Arg(0) == "2"
 
