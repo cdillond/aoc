@@ -1,7 +1,7 @@
 package d4
 
 import (
-	"bufio"
+	"bytes"
 	"os"
 
 	"github.com/cdillond/aoc"
@@ -13,20 +13,12 @@ const (
 )
 
 func Part1(path string) (res string, err error) {
-	var f *os.File
-	if f, err = os.Open(path); err != nil {
+	var b []byte
+	if b, err = os.ReadFile(path); err != nil {
 		return res, err
 	}
-	defer f.Close()
-
-	var lines [][]byte
-	scanner := bufio.NewScanner(f)
-	for scanner.Scan() {
-		bytes := scanner.Bytes()
-		line := make([]byte, len(bytes))
-		copy(line, bytes)
-		lines = append(lines, line)
-	}
+	// input ends in a newline; avoid keeping a trailing empty slice
+	lines := bytes.Split(b[:len(b)-1], []byte("\n"))
 	var count int
 	for i, line := range lines {
 		for j, c := range line {
@@ -78,20 +70,12 @@ func Part1(path string) (res string, err error) {
 }
 
 func Part2(path string) (res string, err error) {
-	var f *os.File
-	if f, err = os.Open(path); err != nil {
+	var b []byte
+	if b, err = os.ReadFile(path); err != nil {
 		return res, err
 	}
-	defer f.Close()
-
-	var lines [][]byte
-	scanner := bufio.NewScanner(f)
-	for scanner.Scan() {
-		bytes := scanner.Bytes()
-		line := make([]byte, len(bytes))
-		copy(line, bytes)
-		lines = append(lines, line)
-	}
+	// input must end in a newline
+	lines := bytes.Split(b[:len(b)-1], []byte("\n"))
 	var count int
 	for i := 1; i < len(lines)-1; i++ {
 		for j := 1; j < len(lines[i])-1; j++ {
