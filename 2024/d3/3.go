@@ -72,18 +72,6 @@ search_m_d:
 		goto search_m_d
 	}
 
-search_mul:
-	if c, ok = p.next(); c != 'u' {
-		goto search_m_d
-	}
-	if c, ok = p.next(); c != 'l' {
-		goto search_m_d
-	}
-	if c, ok = p.next(); c != '(' {
-		goto search_m_d
-	}
-	goto start_num
-
 search_o:
 	if c, ok = p.next(); c != 'o' {
 		goto search_m_d
@@ -120,13 +108,22 @@ match_dont:
 	}
 	return Dont, 0
 
-start_num:
+search_mul:
+	if c, ok = p.next(); c != 'u' {
+		goto search_m_d
+	}
+	if c, ok = p.next(); c != 'l' {
+		goto search_m_d
+	}
+	if c, ok = p.next(); c != '(' {
+		goto search_m_d
+	}
+
 	var digitCount, numCount int
 	var nums [2]int
+
 match_num:
-	if c, ok = p.next(); !ok {
-		return 0, 0
-	}
+	c, ok = p.next()
 	switch {
 	case c == ',' && digitCount == 0:
 		goto search_m_d
