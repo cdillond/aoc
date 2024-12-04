@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"time"
 
 	"github.com/cdillond/aoc/cmd/client"
 	"github.com/cdillond/aoc/cmd/html"
@@ -17,10 +18,11 @@ import (
 
 func main() {
 	// flag variables
-	var part, submit, get bool
+	var part, submit, get, clock bool
 
 	flag.BoolVar(&submit, "submit", false, "submit answer to advent of code")
 	flag.BoolVar(&get, "get", false, "download puzzle input")
+	flag.BoolVar(&clock, "time", false, "measure and print the time taken to execute the solution function")
 	flag.Parse()
 
 	part = flag.Arg(0) == "2"
@@ -37,16 +39,31 @@ func main() {
 	}
 
 	var res string
-
+	var start, stop time.Time
 	switch part {
 	case false:
+		if clock {
+			start = time.Now()
+		}
 		if res, err = puzzle.Part1(input); err != nil {
 			log.Fatalln(err)
 		}
+		if clock {
+			stop = time.Now()
+		}
 	case true:
+		if clock {
+			start = time.Now()
+		}
 		if res, err = puzzle.Part2(input); err != nil {
 			log.Fatalln(err)
 		}
+		if clock {
+			stop = time.Now()
+		}
+	}
+	if clock && (!time.Now().IsZero()) {
+		log.Println("time: ", stop.Sub(start))
 	}
 
 	if submit {
