@@ -64,7 +64,7 @@ search_m_d:
 	}
 	switch c {
 	case 'm':
-		goto search_mul
+		goto search_ul
 	case 'd':
 		goto search_o
 	default:
@@ -108,7 +108,7 @@ match_dont:
 	}
 	return Dont, 0
 
-search_mul:
+search_ul:
 	if c, ok = p.next(); c != 'u' {
 		goto search_m_d
 	}
@@ -125,9 +125,7 @@ search_mul:
 match_num:
 	c, ok = p.next()
 	switch {
-	case c == ',' && digitCount == 0:
-		goto search_m_d
-	case c == ',' && numCount == 0:
+	case c == ',' && numCount == 0 && digitCount > 0:
 		numCount++
 		digitCount = 0
 		goto match_num
@@ -136,7 +134,7 @@ match_num:
 		nums[numCount] += (int(c) - '0')
 		digitCount++
 		goto match_num
-	case c == ')' && digitCount > 0 && numCount == 1:
+	case c == ')' && numCount == 1 && digitCount > 0:
 		break
 	default:
 		goto search_m_d
