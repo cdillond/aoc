@@ -36,9 +36,9 @@ func Part1(path string) (res string, err error) {
 }
 
 const (
-	Do      = 1
-	Dont    = 2
-	Product = 3
+	Done = iota
+	Product
+	Dont
 )
 
 type parser struct {
@@ -46,76 +46,84 @@ type parser struct {
 	b []byte
 }
 
-func (p *parser) next() (c byte, ok bool) {
+func (p *parser) next() (c byte) {
 	if p.n >= len(p.b) {
-		return c, false
+		return c
 	}
 	c = p.b[p.n]
 	p.n++
-	return c, true
+	return c
 }
 
-func (p *parser) match() (kind int, val int) {
-	c, ok := p.next()
+func (p *parser) matchDo() bool {
+	c := p.next()
+
+start:
+	if c == 0 {
+		return false
+	}
+	if c != 'd' {
+		c = p.next()
+		goto start
+	}
+	if c = p.next(); c != 'o' {
+		goto start
+	}
+	if c = p.next(); c != '(' {
+		goto start
+	}
+	if c = p.next(); c != ')' {
+		goto start
+	}
+	return true
+}
+
+func (p *parser) matchMulDont() (kind int, val int) {
+	c := p.next()
 
 search_m_d:
-	if !ok {
-		return 0, 0
+	if c == 0 {
+		return Done, 0
 	}
 	switch c {
 	case 'm':
 		goto search_ul
 	case 'd':
-		goto search_o
-	default:
-		c, ok = p.next()
-		goto search_m_d
-	}
-
-search_o:
-	if c, ok = p.next(); c != 'o' {
-		goto search_m_d
-	}
-	c, ok = p.next()
-
-	switch c {
-	case '(':
-		goto match_do
-	case 'n':
 		goto match_dont
 	default:
+		c = p.next()
 		goto search_m_d
 	}
-
-match_do:
-	if c, ok = p.next(); c != ')' {
-		goto search_m_d
-	}
-	return Do, 0
 
 match_dont:
-	if c, ok = p.next(); c != '\'' {
+	if c = p.next(); c != 'o' {
 		goto search_m_d
 	}
-	if c, ok = p.next(); c != 't' {
+	if c = p.next(); c != 'n' {
 		goto search_m_d
 	}
-	if c, ok = p.next(); c != '(' {
+	if c = p.next(); c != '\'' {
 		goto search_m_d
 	}
-	if c, ok = p.next(); c != ')' {
+	if c = p.next(); c != 't' {
+		goto search_m_d
+	}
+	if c = p.next(); c != '(' {
+		goto search_m_d
+	}
+	if c = p.next(); c != ')' {
 		goto search_m_d
 	}
 	return Dont, 0
 
 search_ul:
-	if c, ok = p.next(); c != 'u' {
+	if c = p.next(); c != 'u' {
 		goto search_m_d
 	}
-	if c, ok = p.next(); c != 'l' {
+	if c = p.next(); c != 'l' {
 		goto search_m_d
 	}
-	if c, ok = p.next(); c != '(' {
+	if c = p.next(); c != '(' {
 		goto search_m_d
 	}
 
@@ -123,7 +131,7 @@ search_ul:
 	var nums [2]int
 
 match_num:
-	c, ok = p.next()
+	c = p.next()
 	switch {
 	case c == ',' && numCount == 0 && digitCount > 0:
 		numCount++
@@ -147,15 +155,13 @@ func Part2(path string) (res string, err error) {
 	if p.b, err = os.ReadFile(path); err != nil {
 		return res, err
 	}
-	var ans int
-	state := Do
-	for kind, val := p.match(); kind != 0; kind, val = p.match() {
-		if kind == Product {
-			if state == Do {
-				ans += val
-			}
-		} else {
-			state = kind
+	var ans, kind, val int
+	for {
+		for kind, val = p.matchMulDont(); kind == Product; kind, val = p.matchMulDont() {
+			ans += val
+		}
+		if kind == Done || !p.matchDo() {
+			break
 		}
 	}
 	return aoc.Itoa(ans), nil
