@@ -1,12 +1,12 @@
-package d2
+package d6
 
 import (
 	"testing"
 )
 
 func TestPart1(t *testing.T) {
-	want := "2"
-	have, err := Part1("../../inputs/2024/2.txt")
+	want := "41"
+	have, err := Part1("example.txt")
 	if have != want {
 		t.Logf("have: %s, want: %s\n", have, want)
 		t.Fail()
@@ -17,8 +17,8 @@ func TestPart1(t *testing.T) {
 }
 
 func BenchmarkPart1(b *testing.B) {
-	for _ = range b.N {
-		_, err := Part1("../../inputs/2024/2.txt")
+	for i := 0; i < b.N; i++ {
+		_, err := Part1("../../inputs/2024/6.txt")
 		if err != nil {
 			b.Logf(err.Error())
 		}
@@ -26,7 +26,7 @@ func BenchmarkPart1(b *testing.B) {
 }
 
 func TestPart2(t *testing.T) {
-	want := "4"
+	want := "6"
 	have, err := Part2("example.txt")
 	if have != want {
 		t.Logf("have: %s, want: %s\n", have, want)
@@ -38,8 +38,8 @@ func TestPart2(t *testing.T) {
 }
 
 func BenchmarkPart2(b *testing.B) {
-	for _ = range b.N {
-		_, err := Part2("../../inputs/2024/2.txt")
+	for i := 0; i < b.N; i++ {
+		_, err := Part1("../../inputs/2024/6.txt")
 		if err != nil {
 			b.Logf(err.Error())
 		}

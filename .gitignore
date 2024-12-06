@@ -4,3 +4,10 @@ template/template
 *.html
 *.prof
 *.code-workspace
+*.c
+*.o
+*.out
+*.a
+*.py
+2024/d*c
+.vscode
