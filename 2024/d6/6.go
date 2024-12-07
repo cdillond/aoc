@@ -17,11 +17,11 @@ const (
 	west
 	north
 	east
-
-	visited = 1 << 7
+	_
+	hash
+	_
+	visited
 )
-
-type point struct{ i, j int }
 
 func b2b(b bool) byte {
 	var x byte
@@ -59,73 +59,38 @@ func walk(i, j int, dir byte, grid [][]byte) {
 	}
 }
 
-func walkCycle(m map[point]byte, i, j int, dir byte, grid [][]byte) bool {
-	clear(m)
-	var p point
-	var h byte
-	for {
-		switch dir {
-		case north:
-			if i == 0 {
-				return false
-			}
-			if grid[i-1][j] == '#' {
-				p.i, p.j = i-1, j
-				h = m[p]
-				if h&north == north {
-					return true
-				}
-				m[p] = h | north
-				dir = east
-				continue
-			}
-			i--
-		case south:
-			if i == len(grid)-1 {
-				return false
-			}
-			if grid[i+1][j] == '#' {
-				p.i, p.j = i+1, j
-				h = m[p]
-				if h&south == south {
-					return true
-				}
-				m[p] = h | south
-				dir = west
-				continue
-			}
-			i++
-		case east:
-			if j == len(grid[i])-1 {
-				return false
-			}
-			if grid[i][j+1] == '#' {
-				p.i, p.j = i, j+1
-				h = m[p]
-				if h&east == east {
-					return true
-				}
-				m[p] = h | east
-				dir = south
-				continue
-			}
-			j++
-		case west:
-			if j == 0 {
-				return false
-			}
-			if grid[i][j-1] == '#' {
-				p.i, p.j = i, j-1
-				h = m[p]
-				if h&west == west {
-					return true
-				}
-				m[p] = h | west
-				dir = north
-				continue
-			}
-			j--
+func clean(b []byte) {
+	for i := range b {
+		if b[i]&visited > 0 {
+			b[i] = visited
+		} else if b[i] == '#' {
+			b[i] = hash
+		} else {
+			b[i] = 0
 		}
+	}
+}
+
+func patrol(i, j int, dir byte, grid [][]byte) bool {
+	var di, dj int
+	var ti, tj int
+	for {
+		di, dj = didj(dir)
+		ti, tj = i+di, j+dj
+		if ti < 0 || ti >= len(grid) || tj < 0 || tj >= len(grid[0]) {
+			return false
+		}
+		if grid[ti][tj]&hash > 0 {
+			if grid[ti][tj]&dir > 0 {
+				return true
+			} else {
+				grid[ti][tj] |= dir
+				dir = turn(dir)
+				continue
+			}
+		}
+		i = ti
+		j = tj
 	}
 }
 
@@ -138,7 +103,7 @@ func Part1(path string) (res string, err error) {
 		b = b[:len(b)-1]
 	}
 	n := bytes.IndexByte(b, '^')
-	b[n] |= visited
+	b[n] = visited
 	grid := bytes.Split(b, []byte{'\n'})
 	startI, startJ := n/len(grid[0]), n%(len(grid[0])+1)
 	walk(startI, startJ, north, grid)
@@ -167,27 +132,24 @@ func Part2(path string) (res string, err error) {
 	startI, startJ := n/len(grid[0]), n%(len(grid[0])+1)
 
 	walk(startI, startJ, north, grid)
-	m := make(map[point]byte)
+	clean(b)
+	clone := make([]byte, len(b))
+	copy(clone, b)
 	var count int
 	for i := 0; i < len(grid); i++ {
 		for j := 0; j < len(grid[i]); j++ {
-			c := grid[i][j]
-			if c == '#' {
-				continue
-			}
-			// no need to obstruct squares not visited in the initial walk
-			if c&visited == 0 {
+
+			if grid[i][j] != visited {
 				continue
 			}
 
 			// try placing a hash in the path
-			grid[i][j] = '#'
-
-			if walkCycle(m, startI, startJ, north, grid) {
+			grid[i][j] = hash
+			if patrol(startI, startJ, north, grid) {
 				count++
 			}
-			// restore original grid value
-			grid[i][j] = c
+			// restore original grid values
+			copy(b, clone)
 		}
 	}
 
