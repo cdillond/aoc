@@ -13,57 +13,48 @@ const (
 )
 
 const (
-	north = 1 << iota
-	east
-	south
+	south = 1 << iota
 	west
+	north
+	east
 
 	visited = 1 << 7
 )
 
 type point struct{ i, j int }
 
+func b2b(b bool) byte {
+	var x byte
+	if b {
+		x = 1
+	}
+	return x
+}
+
+func turn(dir byte) byte {
+	return ((dir << 1) & 0b1111) | ((dir & east) >> 3)
+}
+
+func didj(dir byte) (int, int) {
+	return int(b2b(dir == south)) - int(b2b(dir == north)), int(b2b(dir == east)) - int(b2b(dir == west))
+}
+
 // assumes no cycle is encountered
 func walk(i, j int, dir byte, grid [][]byte) {
+	var di, dj int
+	var ti, tj int
 	for {
-		switch dir {
-		case north:
-			if i == 0 {
-				return
-			}
-			if grid[i-1][j] == '#' {
-				dir = east
-				continue
-			}
-			i--
-		case south:
-			if i == len(grid)-1 {
-				return
-			}
-			if grid[i+1][j] == '#' {
-				dir = west
-				continue
-			}
-			i++
-		case east:
-			if j == len(grid[i])-1 {
-				return
-			}
-			if grid[i][j+1] == '#' {
-				dir = south
-				continue
-			}
-			j++
-		case west:
-			if j == 0 {
-				return
-			}
-			if grid[i][j-1] == '#' {
-				dir = north
-				continue
-			}
-			j--
+		di, dj = didj(dir)
+		ti, tj = i+di, j+dj
+		if ti < 0 || ti >= len(grid) || tj < 0 || tj >= len(grid[0]) {
+			return
 		}
+		if grid[ti][tj] == '#' {
+			dir = turn(dir)
+			continue
+		}
+		i = ti
+		j = tj
 		grid[i][j] |= visited
 	}
 }
