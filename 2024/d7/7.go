@@ -32,7 +32,7 @@ func Part1(path string) (res string, err error) {
 	scanner := bufio.NewScanner(f)
 	var nums []int
 	var count int
-	cur, next := make([]int, 0, 256), make([]int, 0, 256)
+	cur, next := make([]int, 0, 4096), make([]int, 0, 4096)
 	for scanner.Scan() {
 		b := scanner.Bytes()
 		split := bytes.Split(b, []byte{':'})
@@ -41,15 +41,18 @@ func Part1(path string) (res string, err error) {
 		nums, _ = aoc.ParseInts(split[1], nums[:0])
 
 		cur = append(cur[:0], nums[0])
+
 		for i := 1; i < len(nums) && len(cur) > 0; i++ {
 			n := nums[i]
 			for _, c := range cur {
 				if add := c + n; add <= target {
 					next = append(next, add)
 				}
+
 				if mul := c * n; mul <= target {
 					next = append(next, mul)
 				}
+
 			}
 			cur, next = next, cur
 			next = next[:0]
@@ -63,6 +66,7 @@ func Part1(path string) (res string, err error) {
 		}
 
 	}
+
 	return aoc.Itoa(count), nil
 }
 
