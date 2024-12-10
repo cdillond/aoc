@@ -14,17 +14,19 @@ import (
 	"github.com/cdillond/aoc/cmd/html"
 
 	// Update this import path when solving a new problem
-	puzzle "github.com/cdillond/aoc/2024/d8"
+	puzzle "github.com/cdillond/aoc/2024/d10"
 )
 
 func main() {
 	// flag variables
 	var part, submit, get, clock, prof bool
+	var customPath string
 
 	flag.BoolVar(&submit, "submit", false, "submit answer to advent of code")
 	flag.BoolVar(&get, "get", false, "download puzzle input")
 	flag.BoolVar(&clock, "time", false, "measure and print the time taken to execute the solution function")
 	flag.BoolVar(&prof, "prof", false, "run a profile")
+	flag.StringVar(&customPath, "path", "", "use input at specified path")
 	flag.Parse()
 
 	if prof {
@@ -42,8 +44,10 @@ func main() {
 	part = flag.Arg(0) == "2"
 
 	var err error
-
-	input := path.Join("..", "inputs", puzzle.Year, puzzle.Day+".txt")
+	input := customPath
+	if input == "" {
+		input = path.Join("..", "inputs", puzzle.Year, puzzle.Day+".txt")
+	}
 
 	if get {
 		if err = loadInput(puzzle.Day, puzzle.Year, input); err != nil {
