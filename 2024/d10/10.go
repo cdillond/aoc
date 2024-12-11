@@ -71,47 +71,71 @@ func uniqueDFS(startI, startJ int, grid [][]byte, set map[point]struct{}) (score
 	return len(set)
 }
 
-func dfs(startI, startJ int, grid [][]byte) (score int) {
+func recursiveDFS(i, j int, grid [][]byte) (score int) {
+	if grid[i][j] == '9' {
+		return 1
+	}
+	var (
+		iMax = len(grid)
+		jMax = len(grid[i])
+	)
+	if inBounds(i+1, j, iMax, jMax) && grid[i+1][j] == grid[i][j]+1 {
+		score += recursiveDFS(i+1, j, grid)
+	}
+	if inBounds(i, j+1, iMax, jMax) && grid[i][j+1] == grid[i][j]+1 {
+		score += recursiveDFS(i, j+1, grid)
+	}
+	if inBounds(i-1, j, iMax, jMax) && grid[i-1][j] == grid[i][j]+1 {
+		score += recursiveDFS(i-1, j, grid)
+	}
+	if inBounds(i, j-1, iMax, jMax) && grid[i][j-1] == grid[i][j]+1 {
+		score += recursiveDFS(i, j-1, grid)
+	}
+	return score
+}
+
+func dfs(i, j int, grid [][]byte) (score int) {
 	var (
 		iStack, jStack [10]int
 		visited        [10]byte
 		iMax           = len(grid)
 		jMax           = len(grid[0])
 	)
-	iStack[0] = startI
-	jStack[0] = startJ
+	iStack[0] = i
+	jStack[0] = j
 
 	for n, cur := 0, byte('0'); n > -1; n, cur = n-1, cur-1 {
 	next:
-		for {
+		for n < 9 {
+			t := n + 1
+
 			switch {
 			case visited[n]&north == 0:
 				visited[n] |= north
-				iStack[n+1] = iStack[n] - 1
-				jStack[n+1] = jStack[n]
+				iStack[t] = iStack[n] - 1
+				jStack[t] = jStack[n]
 			case visited[n]&south == 0:
 				visited[n] |= south
-				iStack[n+1] = iStack[n] + 1
-				jStack[n+1] = jStack[n]
+				iStack[t] = iStack[n] + 1
+				jStack[t] = jStack[n]
 			case visited[n]&east == 0:
 				visited[n] |= east
-				iStack[n+1] = iStack[n]
-				jStack[n+1] = jStack[n] + 1
+				iStack[t] = iStack[n]
+				jStack[t] = jStack[n] + 1
 			case visited[n]&west == 0:
 				visited[n] |= west
-				iStack[n+1] = iStack[n]
-				jStack[n+1] = jStack[n] - 1
+				iStack[t] = iStack[n]
+				jStack[t] = jStack[n] - 1
 			default:
 				visited[n] = 0
 				break next
 			}
 
-			if inBounds(iStack[n+1], jStack[n+1], iMax, jMax) && grid[iStack[n+1]][jStack[n+1]] == cur+1 {
+			if inBounds(iStack[t], jStack[t], iMax, jMax) && grid[iStack[t]][jStack[t]] == cur+1 {
 				n++
 				cur++
-				if n == 9 {
+				if cur == '9' {
 					score++
-					break next
 				}
 			}
 		}
@@ -123,6 +147,9 @@ func Part1(path string) (res string, err error) {
 	var b []byte
 	if b, err = os.ReadFile(path); err != nil {
 		return res, err
+	}
+	if b[len(b)-1] == '\n' {
+		b = b[:len(b)-1]
 	}
 	grid := bytes.Split(b, []byte{'\n'})
 	var count int
@@ -143,6 +170,9 @@ func Part2(path string) (res string, err error) {
 	var b []byte
 	if b, err = os.ReadFile(path); err != nil {
 		return res, err
+	}
+	if b[len(b)-1] == '\n' {
+		b = b[:len(b)-1]
 	}
 	grid := bytes.Split(b, []byte{'\n'})
 	var count int
