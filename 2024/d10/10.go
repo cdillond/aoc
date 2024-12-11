@@ -124,6 +124,9 @@ func Part1(path string) (res string, err error) {
 	if b, err = os.ReadFile(path); err != nil {
 		return res, err
 	}
+	if b[len(b)-1] == '\n' {
+		b = b[:len(b)-1]
+	}
 	grid := bytes.Split(b, []byte{'\n'})
 	var count int
 	set := make(map[point]struct{})
@@ -143,6 +146,9 @@ func Part2(path string) (res string, err error) {
 	var b []byte
 	if b, err = os.ReadFile(path); err != nil {
 		return res, err
+	}
+	if b[len(b)-1] == '\n' {
+		b = b[:len(b)-1]
 	}
 	grid := bytes.Split(b, []byte{'\n'})
 	var count int
