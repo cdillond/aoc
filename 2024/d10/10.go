@@ -174,13 +174,14 @@ func Part2(path string) (res string, err error) {
 	if b[len(b)-1] == '\n' {
 		b = b[:len(b)-1]
 	}
+
 	grid := bytes.Split(b, []byte{'\n'})
 	var count int
 	for i, row := range grid {
 		for j, c := range row {
 			if c == '0' {
 				score := dfs(i, j, grid)
-				count += score
+				count += score //recursiveDFS(i, j, grid) //score
 			}
 		}
 	}

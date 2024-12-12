@@ -1,30 +1,23 @@
 package {{ .PackageName }}
 
 import (
-	"os"
+	_ "embed"
 )
+
+//go:embed input.txt
+var input []byte
 
 const (
 	Day  = "{{ .Day }}"
 	Year = "{{ .Year }}"
 )
 
-func Part1(path string) (res string, err error) {
-	var f *os.File
-	if f, err = os.Open(path); err != nil {
-		return res, err
-	}
-	defer f.Close()
+func Part1(_ string) (res string, err error) {
 
 	return
 }
 
-func Part2(path string) (res string, err error) {
-	var f *os.File
-	if f, err = os.Open(path); err != nil {
-		return res, err
-	}
-	defer f.Close()
-	
+func Part2(_ string) (res string, err error) {
+
 	return
 }

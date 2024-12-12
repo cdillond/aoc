@@ -14,10 +14,11 @@ import (
 	"github.com/cdillond/aoc/cmd/html"
 
 	// Update this import path when solving a new problem
-	puzzle "github.com/cdillond/aoc/2024/d11"
+	puzzle "github.com/cdillond/aoc/2024/d12"
 )
 
 func main() {
+	//debug.SetGCPercent(-1)
 	// flag variables
 	var part, submit, get, clock, prof bool
 	var customPath string
@@ -32,11 +33,11 @@ func main() {
 	if prof {
 		out, err := os.Create("cpu.prof")
 		if err != nil {
-			log.Fatalln(err)
+			log.Panicln(err)
 		}
 		defer out.Close()
 		if err = pprof.StartCPUProfile(out); err != nil {
-			log.Fatalln(err)
+			log.Panicln(err)
 		}
 		defer pprof.StopCPUProfile()
 	}
@@ -46,19 +47,30 @@ func main() {
 	var err error
 	input := customPath
 	if input == "" {
-		input = path.Join("..", "inputs", puzzle.Year, puzzle.Day+".txt")
+		input = path.Join("..", puzzle.Year, "d"+puzzle.Day, "input.txt")
+		// input = path.Join("..", "inputs", puzzle.Year, puzzle.Day+".txt")
 	}
 
 	if get {
-		availAt, err := time.Parse("02-01-2006", puzzle.Day+"-12-"+puzzle.Year)
+		loc, err := time.LoadLocation("America/New_York")
 		if err != nil {
-			log.Fatalln(err)
+			log.Panicln(err)
 		}
-		t := time.NewTimer(time.Until(availAt))
-		<-t.C
-		t.Stop()
+		availAt, err := time.ParseInLocation("02-01-2006", puzzle.Day+"-12-"+puzzle.Year, loc)
+
+		if err != nil {
+			log.Panicln(err)
+		}
+		if availAt.After(time.Now()) {
+			log.Println("waiting until ", availAt.String())
+			t := time.NewTimer(time.Until(availAt))
+			<-t.C
+			t.Stop()
+			log.Println("fetching input")
+		}
+
 		if err = loadInput(puzzle.Day, puzzle.Year, input); err != nil {
-			log.Fatalln(err)
+			log.Panicln(err)
 		}
 		return
 	}
@@ -71,7 +83,7 @@ func main() {
 			start = time.Now()
 		}
 		if res, err = puzzle.Part1(input); err != nil {
-			log.Fatalln(err)
+			log.Panicln(err)
 		}
 		if clock {
 			stop = time.Now()
@@ -81,7 +93,7 @@ func main() {
 			start = time.Now()
 		}
 		if res, err = puzzle.Part2(input); err != nil {
-			log.Fatalln(err)
+			log.Panicln(err)
 		}
 		if clock {
 			stop = time.Now()
@@ -94,7 +106,7 @@ func main() {
 	if submit {
 		log.Println("solution: ", res)
 		if err := submitResult(partToStr(part), puzzle.Day, puzzle.Year, res); err != nil {
-			log.Fatalln(err)
+			log.Panicln(err)
 		}
 		return
 	}
@@ -135,6 +147,6 @@ func submitResult(part, day, year, res string) error {
 
 	out, err := html.Response(buf)
 
-	fmt.Println(string(out))
+	log.Println(string(out))
 	return err
 }

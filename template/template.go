@@ -38,6 +38,7 @@ func MkTemplate(day, year string) error {
 	const (
 		f1 = "day.go.tmpl"
 		f2 = "day_test.go.tmpl"
+		f3 = "input.txt"
 	)
 	t, err := template.ParseFiles(f1, f2)
 	if err != nil {
@@ -49,7 +50,7 @@ func MkTemplate(day, year string) error {
 		return err
 	}
 
-	var f, ftest *os.File
+	var f, ftest, fin *os.File
 
 	if f, err = os.Create(path.Join(dirPath, day+".go")); err != nil {
 		return err
@@ -76,6 +77,11 @@ func MkTemplate(day, year string) error {
 	if err = t.Lookup(f2).Execute(ftest, data); err != nil {
 		return err
 	}
+
+	if fin, err = os.Create(path.Join(dirPath, "input.txt")); err != nil {
+		return err
+	}
+	defer fin.Close()
 
 	return nil
 }

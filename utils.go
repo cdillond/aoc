@@ -1,9 +1,39 @@
 package aoc
 
 import (
+	"errors"
+	"os"
 	"strconv"
 	"unsafe"
 )
+
+func ReadOrDie(path string) []byte {
+	b, err := os.ReadFile(path)
+	if err != nil {
+		panic(err)
+	}
+	if len(b) < 1 {
+		panic("empty input file")
+	}
+	if b[len(b)-1] == '\n' {
+		b = b[:len(b)-1]
+	}
+	return b
+}
+
+func ReadTrimmed(path string) ([]byte, error) {
+	b, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+	if len(b) < 1 {
+		return nil, errors.New("empty input file")
+	}
+	if b[len(b)-1] == '\n' {
+		b = b[:len(b)-1]
+	}
+	return b, nil
+}
 
 func Abs(n int) int {
 	if n < 0 {
