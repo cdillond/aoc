@@ -14,7 +14,7 @@ import (
 	"github.com/cdillond/aoc/cmd/html"
 
 	// Update this import path when solving a new problem
-	puzzle "github.com/cdillond/aoc/2024/d12"
+	puzzle "github.com/cdillond/aoc/2024/d13"
 )
 
 func main() {

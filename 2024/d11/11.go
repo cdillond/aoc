@@ -61,7 +61,6 @@ func solve(rounds int, line []byte) (int, error) {
 		for num, count := range cache {
 			if num == 0 {
 				next[1] += count
-				//1 + int(math.Log10(float64(num)))
 			} else if digits = numDigits(num); digits&1 == 0 {
 				digits = p10(digits / 2)
 				lowerHalf := num % digits
