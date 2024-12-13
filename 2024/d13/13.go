@@ -67,9 +67,11 @@ func (s *system) solve() {
 	aNum, aDen := s.c1*s.b2-s.b1*s.c2, s.a1*s.b2-s.b1*s.a2
 	bNum, bDen := s.a1*s.c2-s.c1*s.a2, s.a1*s.b2-s.b1*s.a2
 
-	s.a = aNum / aDen
-	s.b = bNum / bDen
-	if s.a*aDen != aNum || s.b*bDen != bNum {
+	if s.a = aNum / aDen; s.a*aDen != aNum {
+		s.a, s.b = 0, 0
+		return
+	}
+	if s.b = bNum / bDen; s.b*bDen != bNum {
 		s.a, s.b = 0, 0
 	}
 }
