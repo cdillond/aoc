@@ -5,7 +5,6 @@ import (
 	"bytes"
 	_ "embed"
 	"errors"
-	"math/big"
 
 	"github.com/cdillond/aoc"
 )
@@ -22,7 +21,7 @@ type system struct {
 	a1, a2 int64
 	b1, b2 int64
 	c1, c2 int64
-	a, b   *big.Rat
+	a, b   int64
 }
 
 func (s *system) unmarshal(scanner *bufio.Scanner) error {
@@ -65,15 +64,18 @@ func (s *system) unmarshal(scanner *bufio.Scanner) error {
 }
 
 func (s *system) solve() {
-	s.a = big.NewRat((s.c1*s.b2 - s.b1*s.c2), (s.a1*s.b2 - s.b1*s.a2))
-	s.b = big.NewRat((s.a1*s.c2 - s.c1*s.a2), (s.a1*s.b2 - s.b1*s.a2))
+	aNum, aDen := s.c1*s.b2-s.b1*s.c2, s.a1*s.b2-s.b1*s.a2
+	bNum, bDen := s.a1*s.c2-s.c1*s.a2, s.a1*s.b2-s.b1*s.a2
+
+	s.a = aNum / aDen
+	s.b = bNum / bDen
+	if s.a*aDen != aNum || s.b*bDen != bNum {
+		s.a, s.b = 0, 0
+	}
 }
 
 func (e system) cost() int64 {
-	if !(e.a.IsInt() && e.b.IsInt()) {
-		return 0
-	}
-	return 3*e.a.Num().Int64() + e.b.Num().Int64()
+	return 3*e.a + e.b
 
 }
 
