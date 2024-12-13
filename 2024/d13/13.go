@@ -21,16 +21,12 @@ type system struct {
 	a1, a2 int64
 	b1, b2 int64
 	c1, c2 int64
-	a, b   int64
 }
 
-func (s *system) unmarshal(scanner *bufio.Scanner) error {
-	var (
-		ok       bool
-		ErrParse = errors.New("error parsing input")
-	)
+var ErrParse = errors.New("error parsing input")
 
-	if ok = scanner.Scan(); !ok {
+func (s *system) unmarshal(scanner *bufio.Scanner) error {
+	if !scanner.Scan() {
 		return ErrParse
 	}
 	b := scanner.Bytes()
@@ -40,7 +36,7 @@ func (s *system) unmarshal(scanner *bufio.Scanner) error {
 	n += 1 + len(" Y+")
 	s.a2 = int64(aoc.Atoi(b[n:]))
 
-	if ok = scanner.Scan(); !ok {
+	if !scanner.Scan() {
 		return ErrParse
 	}
 	b = scanner.Bytes()
@@ -50,7 +46,7 @@ func (s *system) unmarshal(scanner *bufio.Scanner) error {
 	n += 1 + len(" Y+")
 	s.b2 = int64(aoc.Atoi(b[n:]))
 
-	if ok = scanner.Scan(); !ok {
+	if !scanner.Scan() {
 		return ErrParse
 	}
 	b = scanner.Bytes()
@@ -59,38 +55,39 @@ func (s *system) unmarshal(scanner *bufio.Scanner) error {
 	s.c1 = int64(aoc.Atoi(b[:n]))
 	n += 1 + len(" Y=")
 	s.c2 = int64(aoc.Atoi(b[n:]))
-
 	return nil
 }
 
-func (s *system) solve() {
-	aNum, aDen := s.c1*s.b2-s.b1*s.c2, s.a1*s.b2-s.b1*s.a2
-	bNum, bDen := s.a1*s.c2-s.c1*s.a2, s.a1*s.b2-s.b1*s.a2
+func (s system) solve() (a, b int64) {
+	// if the determinant is 0, the program will panic later on.
+	// luckily, with the given input, that never happens. this
+	// also means that none of the button vectors are colinear,
+	// so the solutions are unique and there's no need to find
+	// the 'minimum' cost.
+	det := s.a1*s.b2 - s.a2*s.b1
 
-	if s.a = aNum / aDen; s.a*aDen != aNum {
-		s.a, s.b = 0, 0
-		return
+	aNum := s.c1*s.b2 - s.b1*s.c2
+	bNum := s.a1*s.c2 - s.c1*s.a2
+
+	if a = aNum / det; a < 0 || a*det != aNum {
+		return 0, 0
 	}
-	if s.b = bNum / bDen; s.b*bDen != bNum {
-		s.a, s.b = 0, 0
+	if b = bNum / det; b < 0 || b*det != bNum {
+		return 0, 0
 	}
-}
-
-func (s system) cost() int64 {
-	return 3*s.a + s.b
-
+	return a, b
 }
 
 func Part1(_ string) (res string, err error) {
 	scanner := bufio.NewScanner(bytes.NewReader(input))
-	s := new(system)
-	var total int64
+	var s system
+	var a, b, total int64
 	for {
 		if err = s.unmarshal(scanner); err != nil {
 			return res, err
 		}
-		s.solve()
-		total += s.cost()
+		a, b = s.solve()
+		total += 3*a + b
 		if !scanner.Scan() {
 			break
 		}
@@ -100,16 +97,16 @@ func Part1(_ string) (res string, err error) {
 
 func Part2(_ string) (res string, err error) {
 	scanner := bufio.NewScanner(bytes.NewReader(input))
-	s := new(system)
-	var total int64
+	var s system
+	var a, b, total int64
 	for {
 		if err = s.unmarshal(scanner); err != nil {
 			return res, err
 		}
 		s.c1 += 10000000000000
 		s.c2 += 10000000000000
-		s.solve()
-		total += s.cost()
+		a, b = s.solve()
+		total += 3*a + b
 		if !scanner.Scan() {
 			break
 		}
