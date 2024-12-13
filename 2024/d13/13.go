@@ -76,8 +76,8 @@ func (s *system) solve() {
 	}
 }
 
-func (e system) cost() int64 {
-	return 3*e.a + e.b
+func (s system) cost() int64 {
+	return 3*s.a + s.b
 
 }
 
