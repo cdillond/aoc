@@ -14,12 +14,11 @@ import (
 	"github.com/cdillond/aoc/cmd/html"
 
 	// Update this import path when solving a new problem
-	puzzle "github.com/cdillond/aoc/2024/d13"
+	puzzle "github.com/cdillond/aoc/2024/d14"
 )
 
 func main() {
-	//debug.SetGCPercent(-1)
-	// flag variables
+
 	var part, submit, get, clock, prof bool
 	var customPath string
 
